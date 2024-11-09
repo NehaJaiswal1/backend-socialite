@@ -3,13 +3,17 @@
 
 const express = require("express");
 const mongoose = require("mongoose");
-const dotenv = require("dotenv");
+
 const route = require("./route/routes");
-dotenv.config();
+require("dotenv").config();
+
 const port = process.env.PORT || 3001;
 mongoose.set("strictQuery", true);
 const app = express();
 const cors = require('cors')
+const passport = require("./controller/passport");
+const session = require("express-session");
+
 
 app.use(cors())
 
@@ -22,6 +26,20 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   next();
 });
+
+
+// Session setup
+app.use(
+  session({
+    secret: "neha",
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+
+// Initialize Passport
+app.use(passport.initialize());
+app.use(passport.session());
 
 mongoose
   .connect(
@@ -37,6 +55,12 @@ mongoose
 
 app.use("/", route);
 
+// Facebook Auth Routes
+// route/routes.js
+
+
 app.listen(port,  () => {
   console.log(`App is running on port ${port}`);
 });
+console.log("Facebook Client ID:", '1462946945093819');
+console.log("Facebook Client Secret:", '7973bf8a3e219d4081db44103dc4df22');
